@@ -13,12 +13,27 @@ date=[]
 sum=[]
 sub1=[]
 sub2=[]
+title=str()
+
 
 #Adatbekérés
-ui=int(input('Adj meg azt az évszámot 2019-2023-ig amelynek az adatait látni szeretnéd:\n'))
-sheet_plot=int(input('Adj meg egy számot 1-3 között, hogy melyik táblázatból a PLOT diagram készüljön:\n'))
-sheet_line1=int(input('Adj meg egy számot 1-3 között, hogy melyik legyen az ELSŐ táblázat amiből a lineáris regresszió készüljön:\n'))
-sheet_line2=int(input('Adj meg egy számot 1-3 között, hogy melyik legyen a MÁSODIK táblázat amiből a lineáris regresszió készüljön:\n'))
+ui=2019#int(input('Adj meg azt az évszámot 2019-2023-ig amelynek az adatait látni szeretnéd:\n'))
+sheet_plot=1#int(input('Adj meg egy számot 1-3 között, hogy melyik táblázatból a PLOT diagram készüljön:\n'))
+sheet_line=2#int(input('Adj meg egy számot 1-3 között, hogy melyik táblázatból a lineáris regreszzió diagram készüljön:\n'))
+sheet_line1=2019#int(input('Adj meg azt az évszámot 2019-2023-ig amiből a lineáris regresszió készüljön:\n'))
+sheet_line2=2020#int(input('Adj meg azt az évszámot 2019-2023-ig amiből a lineáris regresszió készüljön:\n'))
+
+
+def Title(x):
+    title=str(0)
+    if x ==1:
+        title=numpy_array[1,0]
+    elif x==2:
+        title=numpy_array[15,0]
+    elif x==3:
+        title=numpy_array[29,0]
+    return title
+    
 
 #Évszám Ellenőrzés
 def YearCheck(x):
@@ -33,7 +48,7 @@ def YearCheck(x):
 def Yearsorter(x):
     y=0
     if x==2019:
-        y=13
+        y=14
     elif x==2020:
         y=2*13
     elif x==2021:
@@ -75,7 +90,7 @@ def SheetsorterAndEqualtyCheck(x,y):
                 y=(input('Ebben az Ecelben csak 3 táblázat szerepel\nAdj meg egy számot 1 és 3 között:\n'))
     return y
 
-#Adatok kinyerése Plot regresszióhoz
+#Adatok kinyerése Plot diagramhoz
 def DataReadingForPlotRegression(numpy_array):
     for i, sor in enumerate(numpy_array):
         if i==0:
@@ -87,32 +102,30 @@ def DataReadingForPlotRegression(numpy_array):
                 if j!=0 and j!=1 and (j<Yearsorter(ui)and j>Yearsorter(ui)-13):
                     sum.append(elem)
 
-
-
 #Adatok kinyerése Lineáris regresszióhoz
 def DataReadingForLinearRegression(numpy_array):
         for i, sor in enumerate(numpy_array):
-            if i!=0 and i == SheetSorter(sheet_line1):
+            if i!=0 and i ==SheetSorter(sheet_line):
                 for j, elem in enumerate(sor):
-                    if j !=1 and (j<Yearsorter(ui)and j>Yearsorter(ui)-13):
+                    if j !=1 and (j<Yearsorter(sheet_line1)and j>Yearsorter(sheet_line1)-13):
                         sub1.append(elem)
-            if i==SheetSorter(sheet_line2):
+            if i==SheetSorter(sheet_line):
                 for j, elem in enumerate(sor):
-                    if j !=1 and (j<Yearsorter(ui)and j>Yearsorter(ui)-13):
+                    if j !=1 and (j<Yearsorter(sheet_line2)and j>Yearsorter(sheet_line2)-13):
                         sub2.append(elem)
         return sub1,sub2              
 
 #Plot Diagram létrehozása
-def CreateScatterPlot(x, y, title="Scatter Plot"):
-    plt.plot(x, y, marker='o', linestyle='-')
-    plt.title(title)
+def CreateScatterPlot(x, y, Title=str(ui)+' '+Title(sheet_plot)):
+    plt.plot(x, y, linestyle='-')
+    plt.title(Title)
     plt.xlabel('Mért hónapok')
     plt.ylabel('Összérték')
     plt.xticks(rotation='vertical')
     plt.show()
 
-# Lineáris regresszió model létrehozása
-def CreateLinearRegressionPlot(x, y, title="Linear Regression"):
+# Lineáris regresszió létrehozása
+def CreateLinearRegressionPlot(x, y, Title=str(sheet_line1)+'-'+str(sheet_line2)+' '+Title(sheet_line)):
     d1=np.array(x)
     d2=np.array(y)
     nan1=np.isnan(d1)
@@ -129,7 +142,7 @@ def CreateLinearRegressionPlot(x, y, title="Linear Regression"):
     # Lineáris regressziós diagram létrehozása
     plt.scatter(sub1a, sub2a, label='Data Points')
     plt.plot(x_line, y_line, color='red', label='Linear Regression Line')
-    plt.title(title)
+    plt.title(Title)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.legend()
@@ -138,9 +151,8 @@ def CreateLinearRegressionPlot(x, y, title="Linear Regression"):
 
 #Függvények meghívása
 YearCheck(ui)
-sheet_line2=SheetsorterAndEqualtyCheck(sheet_line1,sheet_line2)
-sheet_line1=SheetsorterAndEqualtyCheck(sheet_line2,sheet_line1)
+title=Title(sheet_plot)
 DataReadingForPlotRegression(numpy_array)
-CreateScatterPlot(date,sum,  title="Scatter Plot")
+CreateScatterPlot(date,sum,title)
 DataReadingForLinearRegression(numpy_array)
-CreateLinearRegressionPlot(sub1,sub2, title="Linear Regression") 
+CreateLinearRegressionPlot(sub1,sub2, Title=str(sheet_line1)+'-'+str(sheet_line2)+' '+Title(sheet_line)) 
